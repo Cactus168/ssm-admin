@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.organ.dao.OrganDao" >
+ <insert id="add" parameterType="com.jo.sys.organ.bean.Organ" >
+     INSERT INTO t_sys_organ
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	<if test="parentId != null" >parentId,</if>
+	     <if test="parentName != null" >parentName,</if>
+	     <if test="organNo != null" >organNo,</if>
+	     <if test="organName != null" >organName,</if>
+	     <if test="organContent != null" >organContent,</if>
+	     <if test="creator != null" >creator,</if>
+	     createDate,
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="parentId != null" >#{parentId,jdbcType=INTEGER},</if>
+	     <if test="parentName != null" >#{parentName,jdbcType=VARCHAR},</if>
+	     <if test="organNo != null" >#{organNo,jdbcType=VARCHAR},</if>
+	     <if test="organName != null" >#{organName,jdbcType=VARCHAR},</if>
+	     <if test="organContent != null" >#{organContent,jdbcType=VARCHAR},</if>
+	     <if test="creator != null" >#{creator,jdbcType=VARCHAR},</if>
+	     now(),
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_organ WHERE organId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.organ.bean.Organ" >
+    UPDATE t_sys_organ
+       <set>
+	       <if test="organNo != null" >
+	         organNo = #{organNo,jdbcType=VARCHAR},
+	       </if>
+	       <if test="organName != null" >
+	         organName = #{organName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="organContent != null" >
+	         organContent = #{organContent,jdbcType=VARCHAR},
+	       </if>
+	       <if test="modify != null" >
+	         modify = #{modify,jdbcType=VARCHAR},
+	       </if>
+	       modifyDate = now(),
+      </set>
+   WHERE organId = #{organId,jdbcType=INTEGER}
+  </update>
+  <select id="queryById" resultType="com.jo.sys.organ.bean.Organ" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_organ WHERE organId = #{organId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.organ.bean.Organ" parameterType="com.jo.sys.organ.bean.Organ" >
+	SELECT A.*, A.parentId AS _parentId, COUNT(B.userId) AS organUse FROM t_sys_organ A LEFT JOIN t_sys_user_organ B ON A.organId = B.organId 
+    <where>
+       <if test="organNo != null and organNo != '' ">   
+	       AND A.organNo like CONCAT('%',#{organNo},'%') 
+	   </if>
+	   <if test="organName != null and organName != ''">
+	    	AND A.organName like CONCAT('%',#{organName},'%') 
+	   </if>
+   </where>
+   GROUP BY A.organId
+   ORDER BY ${sort} ${order}
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="com.jo.sys.organ.bean.Organ" >
+    SELECT COUNT(organId) FROM t_sys_organ 
+    <where>
+       <if test="organNo != null and organNo != '' ">   
+	       AND organNo like CONCAT('%',#{organNo},'%') 
+	   </if>
+	   <if test="organName != null and organName != ''">
+	    	AND organName like CONCAT('%',#{organName},'%') 
+	   </if>
+   </where>
+  </select>
+</mapper>

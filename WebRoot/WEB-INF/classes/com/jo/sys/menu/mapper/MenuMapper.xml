@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.menu.dao.MenuDao" >
+ <insert id="add" parameterType="com.jo.sys.menu.bean.Menu" >
+     INSERT INTO t_sys_menu
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	 <if test="parentId != null" >parentId,</if>
+      	 <if test="parentName != null" >parentName,</if>
+	     <if test="menuNo != null" >menuNo,</if>
+	     <if test="menuName != null" >menuName,</if>
+	     <if test="menuIcon != null" >menuIcon,</if>
+	     <if test="menuUrl != null" >menuUrl,</if>
+	     <if test="menuType != null" >menuType,</if>
+	     <if test="menuOrder != null" >menuOrder,</if>
+	     <if test="menuStatus != null" >menuStatus,</if>
+	     <if test="menuRemark != null" >menuRemark,</if>
+	     <if test="creator != null" >creator,</if>
+	     createDate,
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="parentId != null" >#{parentId,jdbcType=INTEGER},</if>
+	   	 <if test="parentName != null">#{parentName,jdbcType=VARCHAR},</if>
+	     <if test="menuNo != null" >#{menuNo,jdbcType=VARCHAR},</if>
+	     <if test="menuName != null" >#{menuName,jdbcType=VARCHAR},</if>
+	     <if test="menuIcon != null" >#{menuIcon,jdbcType=VARCHAR},</if>
+	     <if test="menuUrl != null" >#{menuUrl,jdbcType=VARCHAR},</if>
+	     <if test="menuType != null" >#{menuType,jdbcType=INTEGER},</if>
+	     <if test="menuOrder != null" >#{menuOrder,jdbcType=INTEGER},</if>
+	     <if test="menuStatus != null" >#{menuStatus,jdbcType=INTEGER},</if>
+	     <if test="menuRemark != null" >#{menuRemark,jdbcType=VARCHAR},</if>
+	     <if test="creator != null" >#{creator,jdbcType=INTEGER},</if>
+	     now(),
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_menu WHERE parentId IN (${ids}) OR menuId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.menu.bean.Menu" >
+    UPDATE t_sys_menu
+       <set>
+	       <if test="menuNo != null" >
+	         menuNo = #{menuNo,jdbcType=VARCHAR},
+	       </if>
+	       <if test="menuName != null" >
+	         menuName = #{menuName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="menuIcon != null" >
+	         menuIcon = #{menuIcon,jdbcType=VARCHAR},
+	       </if>
+	       <if test="menuUrl != null" >
+	         menuUrl = #{menuUrl,jdbcType=VARCHAR},
+	       </if>
+	       <if test="menuType != null" >
+	         menuType = #{menuType,jdbcType=INTEGER},
+	       </if>
+	       <if test="menuOrder != null" >
+	         menuOrder = #{menuOrder,jdbcType=INTEGER},
+	       </if>
+	       <if test="menuStatus != null" >
+	         menuStatus = #{menuStatus,jdbcType=INTEGER},
+	       </if>
+	       <if test="menuRemark != null" >
+	         menuRemark = #{menuRemark,jdbcType=VARCHAR},
+	       </if>
+	       	modifyDate=now()
+      </set>
+   WHERE menuId = #{menuId,jdbcType=INTEGER}
+</update>
+  <select id="queryById" resultType="com.jo.sys.menu.bean.Menu" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_menu WHERE menuId = #{menuId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.menu.bean.Menu" parameterType="com.jo.sys.menu.bean.Menu" >
+    SELECT A.*, A.parentId AS _parentId, COUNT(B.roleId) AS menuUse FROM t_sys_menu A LEFT JOIN t_sys_role_menu B ON A.menuId = B.menuId 
+    <where>
+    	AND A.buttonId = 0
+       <if test="menuNo != null and menuNo != '' ">   
+	       AND A.menuNo like CONCAT('%',#{menuNo},'%') 
+	   </if>
+	   <if test="menuName != null and menuName != ''">
+	    	AND A.menuName like CONCAT('%',#{menuName},'%') 
+	   </if>
+ 	   <if test="menuStatus != null and menuStatus != ''">    
+ 	       AND A.menuStatus = #{menuNo} 
+ 	   </if>
+ 	   <if test="parentId != null and parentId != ''">    
+ 	       AND A.parentId = #{parentId} 
+ 	   </if>
+   </where>
+   GROUP BY A.menuId
+   ORDER BY ${sort} ${order}
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="com.jo.sys.menu.bean.Menu" >
+    SELECT COUNT(menuId) FROM t_sys_menu
+    <where>
+    	AND buttonId = 0
+       <if test="menuNo != null and menuNo != '' ">   
+	       AND menuNo like CONCAT('%',#{menuNo},'%') 
+	   </if>
+	   <if test="menuName != null and menuName != ''">
+	    	AND menuName like CONCAT('%',#{menuName},'%') 
+	   </if>
+ 	   <if test="menuStatus != null and menuStatus != ''">    
+ 	       AND menuStatus = #{menuNo} 
+ 	   </if>
+ 	   <if test="_parentId != null and _parentId != ''">    
+ 	       AND parentId = #{_parentId} 
+ 	   </if>
+   </where>
+  </select>
+  <delete id="removeButtonByMenuId" parameterType="java.util.Map">
+     DELETE FROM t_sys_menu WHERE parentId = #{menuId} AND buttonId IN (${buttonIds});
+  </delete>
+  <insert id="changeMenuButtonRights" parameterType="java.util.Map">
+  	 INSERT INTO t_sys_menu (parentId, buttonId, menuType) SELECT #{menuId} AS parentId, buttonId, #{menuType} FROM t_sys_button WHERE buttonId IN (${buttonIds});
+  </insert>
+  <select id="getButtonsByMenuId" resultType="com.jo.sys.menu.bean.MenuButton" parameterType="java.lang.String" >
+     SELECT A.*, A.parentId AS _parentId, IFNULL(B.menuId,0) AS checked, COUNT(C.roleId) AS buttonUse FROM t_sys_button A LEFT JOIN t_sys_menu B ON A.buttonId = B.buttonId AND B.parentId = #{menuId} LEFT JOIN t_sys_role_menu C ON B.menuId = C.menuId GROUP BY A.buttonId
+  </select>
+  <delete id="removeDictsByMenuId" parameterType="java.util.Map">
+     DELETE FROM t_sys_menu_dict WHERE menuId = #{menuId};
+  </delete>
+  <insert id="changeMenuDictRights" parameterType="java.util.Map">
+     INSERT INTO t_sys_menu_dict (menuId,dictId) SELECT #{menuId} AS menuId, dictId FROM t_sys_dict WHERE dictId IN (${dictIds});
+  </insert>
+  <select id="getDictsByMenuId" resultType="com.jo.sys.menu.bean.MenuDict" parameterType="java.lang.String" >
+     SELECT 
+      	A.dictId, CASE WHEN A.parentId = 0 THEN A.dictName ELSE A.dictValue END AS dictName, A.parentId AS _parentId, B.menuId,IFNULL(B.dictId,0) AS checked 
+	 FROM t_sys_dict A LEFT JOIN t_sys_menu_dict B ON A.dictId = B.dictId AND B.menuId = #{menuId};
+  </select>
+</mapper>

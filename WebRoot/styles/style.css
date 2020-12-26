@@ -1,0 +1,25 @@
+html,body {
+  overflow:hidden;
+  margin:0px;
+  width:100%;
+  height:100%;
+}
+.virtual_body {
+    width:100%;
+    height:100%;
+    overflow-y:scroll;
+    overflow-x:auto;
+}
+.fixed_div {
+    position:absolute;
+    z-index:2008;
+    bottom:20px;
+    left:50%;
+    width:100px;
+    height:30px; 
+}
+.icon-index-time{background:url('images/index/time.png') no-repeat center center;}
+.icon-index-user{background:url('images/index/user.png') no-repeat center center;}
+.icon-index-bell{background:url('images/index/bell.png') no-repeat center center;}
+.icon-index-bell1{background:url('images/index/bell1.png') no-repeat center center;}
+.icon-index-skin{background:url('images/index/skin.png') no-repeat center center;}

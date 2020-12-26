@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.button.dao.ButtonDao" >
+ <insert id="add" parameterType="com.jo.sys.button.bean.Button" >
+     INSERT INTO t_sys_button
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+         <if test="parentId != null" >parentId,</if>
+      	 <if test="parentName != null" >parentName,</if>
+      	 <if test="buttonNo != null" >buttonNo,</if>
+      	 <if test="buttonIcon != null" >buttonIcon,</if>
+      	 <if test="buttonType != null" >buttonType,</if>
+	     <if test="buttonName != null" >buttonName,</if>
+	     <if test="buttonSort != null" >buttonSort,</if>
+	     <if test="buttonEvent != null" >buttonEvent,</if>
+	     <if test="buttonContent != null" >buttonContent,</if>
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="parentId != null" >#{parentId,jdbcType=INTEGER},</if>
+	   	 <if test="parentName != null">#{parentName,jdbcType=VARCHAR},</if>
+	   	 <if test="buttonNo != null">#{buttonNo,jdbcType=VARCHAR},</if>
+	   	 <if test="buttonIcon != null">#{buttonIcon,jdbcType=VARCHAR},</if>
+	   	 <if test="buttonType != null">#{buttonType,jdbcType=INTEGER},</if>
+	     <if test="buttonName != null" >#{buttonName,jdbcType=VARCHAR},</if>
+	     <if test="buttonSort != null" >#{buttonSort,jdbcType=INTEGER},</if>
+	     <if test="buttonEvent != null" >#{buttonEvent,jdbcType=VARCHAR},</if>
+	     <if test="buttonContent != null" >#{buttonContent,jdbcType=VARCHAR},</if>
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_button WHERE buttonId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.button.bean.Button" >
+    UPDATE t_sys_button
+       <set>
+	       <if test="buttonNo != null" >
+	         buttonNo = #{buttonNo,jdbcType=VARCHAR},
+	       </if>
+	       <if test="buttonIcon != null" >
+	         buttonIcon = #{buttonIcon,jdbcType=VARCHAR},
+	       </if>
+	       <if test="buttonName != null" >
+	         buttonName = #{buttonName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="buttonType != null" >
+	         buttonType = #{buttonType,jdbcType=INTEGER},
+	       </if>
+	        <if test="buttonSort != null" >
+	         buttonSort = #{buttonSort,jdbcType=INTEGER},
+	       </if>
+	       <if test="buttonEvent != null" >
+	         buttonEvent = #{buttonEvent,jdbcType=INTEGER},
+	       </if>
+	       <if test="buttonContent != null" >
+	         buttonContent = #{buttonContent,jdbcType=VARCHAR},
+	       </if>
+      </set>
+   WHERE buttonId = #{buttonId,jdbcType=INTEGER}
+</update>
+  <select id="queryById" resultType="com.jo.sys.button.bean.Button" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_button WHERE buttonId = #{buttonId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.button.bean.Button" parameterType="com.jo.sys.button.bean.Button" >
+    SELECT A.*, A.parentId AS _parentId, COUNT(B.menuId) AS buttonUse FROM t_sys_button A LEFT JOIN t_sys_menu B ON A.buttonId = B.buttonId 
+    <where>
+	   <if test="buttonName != null and buttonName != ''">
+	    	AND A.buttonName like CONCAT('%',#{buttonName},'%') 
+	   </if>
+   </where>
+   GROUP BY A.buttonId
+   ORDER BY ${sort} ${order}
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="com.jo.sys.button.bean.Button" >
+    SELECT COUNT(buttonId) FROM t_sys_button
+    <where>
+	   <if test="buttonName != null and buttonName != ''">
+	    	AND buttonName like CONCAT('%',#{buttonName},'%') 
+	   </if>
+   </where>
+  </select>
+</mapper>

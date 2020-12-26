@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.log.dao.LogDao" >
+ <insert id="add" parameterType="com.jo.sys.log.bean.Log" >
+     INSERT INTO t_sys_log
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	<if test="userId != null" >userId,</if>
+	     <if test="logIp != null" >logIp,</if>
+	     <if test="menuId != null" >menuId,</if>
+	     <if test="logContent != null" >logContent,</if>
+	     logDate,
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="userId != null" >#{userId,jdbcType=INTEGER},</if>
+	     <if test="logIp != null" >#{logIp,jdbcType=VARCHAR},</if>
+	     <if test="menuId != null" >#{menuId,jdbcType=INTEGER},</if>
+	     <if test="logContent != null" >#{logContent,jdbcType=VARCHAR},</if>
+	     now(),
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_log WHERE logId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.log.bean.Log" >
+    UPDATE t_sys_log
+       <set>
+	       <if test="userId != null" >
+	         userId = #{userId,jdbcType=INTEGER},
+	       </if>
+	       <if test="logIp != null" >
+	         logIp = #{logIp,jdbcType=VARCHAR},
+	       </if>
+	       <if test="menuId != null" >
+	         menuId = #{menuId,jdbcType=INTEGER},
+	       </if>
+	       <if test="logContent != null" >
+	         logContent = #{logContent,jdbcType=VARCHAR},
+	       </if>
+	       	logDate=now()
+      </set>
+   WHERE logId = #{logId,jdbcType=INTEGER}
+  </update>
+  <select id="queryById" resultType="com.jo.sys.log.bean.Log" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_log WHERE logId = #{logId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.log.bean.Log" parameterType="com.jo.sys.log.bean.Log" >
+    SELECT A.logId,A.userId,B.userName,B.realName, A.logIp, A.menuId, C.menuName, A.logContent, A.logDate 
+    FROM t_sys_log A LEFT JOIN t_sys_user B ON A.userId = B.userId LEFT JOIN t_sys_menu C ON A.menuId = C.menuId
+    <where>
+       <if test="userName != null and userName != '' ">   
+	       AND B.userName like CONCAT('%',#{userName},'%') 
+	   </if>
+	   <if test="realName != null and realName != ''">
+	    	AND B.realName like CONCAT('%',#{realName},'%') 
+	   </if>
+ 	   <if test="menuName != null and menuName != ''">    
+ 	       AND C.menuName like CONCAT('%',#{menuName},'%')
+ 	   </if>
+ 	   <if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">    
+ 	       AND A.logDate BETWEEN CONCAT(#{beginDate},' 00:00:00') AND CONCAT(#{endDate},' 23:59:59') 
+ 	   </if>
+   </where>
+   ORDER BY ${sort} ${order}
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="com.jo.sys.log.bean.Log" >
+    SELECT 
+    	COUNT(A.logId)
+    FROM t_sys_log A LEFT JOIN t_sys_user B ON A.userId = B.userId LEFT JOIN t_sys_menu C ON A.menuId = C.menuId
+    <where>
+       <if test="userName != null and userName != '' ">   
+	       AND B.userName like CONCAT('%',#{userName},'%') 
+	   </if>
+	   <if test="realName != null and realName != ''">
+	    	AND B.realName like CONCAT('%',#{realName},'%') 
+	   </if>
+ 	   <if test="menuName != null and menuName != ''">    
+ 	       AND C.menuName like CONCAT('%',#{menuName},'%')
+ 	   </if>
+ 	   <if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">    
+ 	       AND A.logDate BETWEEN CONCAT(#{beginDate},' 00:00:00') AND CONCAT(#{endDate},' 23:59:59') 
+ 	   </if>
+   </where>
+  </select>
+</mapper>

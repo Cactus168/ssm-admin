@@ -1,0 +1,211 @@
+a{text-decoration:none;}
+li{list-style:none;}
+table{color:#EEE;}
+.logo {
+  float: left;
+  font-size: 24px;
+  line-height: 50px;
+  padding: 0px;
+  width: 330px;
+  font-family: 'Kaushan Script', cursive;
+  font-weight:bold;
+  font-weight: 500;
+  height: 50px;
+  display: block;
+  color: #EEE;
+  text-align: left;
+}
+.logo img{
+	width: 48px;
+	height: 48px;
+	padding: 0px;
+	margin:0px;
+	vertical-align: middle;
+}
+.photo_info .photo{
+	padding-top: 0px;
+	margin-right: 10px;
+}
+.photo_info .photo img{
+	line-height: 45px;
+	width:45px;
+	height: 45px;
+	border:2px solid #0c4169;
+    -webkit-border-radius: 50%;
+	-moz-border-radius: 50%;
+	-ms-border-radius: 50%;
+	-o-border-radius: 50%;
+	border-radius: 50%;
+    opacity: 0.9;
+	filter:alpha(opacity=90); 
+}
+.fl{float:left;}
+.fr{float:right}
+.z-menu
+{
+    padding: 5px;
+    margin: 0px;
+    margin-right: 0;
+    overflow: auto;
+}
+.z-menu li
+{
+    padding: 5px 40px;
+    display: block;
+    color: #EEE;
+    margin-bottom: 1px;
+    cursor: pointer;
+    background-position:20,5;
+    margin-right: 10px;
+}
+.z-menu li:hover
+{
+	font-weight:bold;
+	border-style: dotted;
+    border: 1px dashed #0972A5;
+}
+.z-menu .act
+{
+    font-weight:bold;
+	border-style: dotted;
+    border: 1px dashed #0972A5;
+}
+.nav{
+	margin: 5px;
+	width: 35px;
+	line-height: 48px;
+	height: 48px;
+	margin-right: 10px;
+	cursor: pointer;
+}
+.nav-link {
+  position: relative;
+  margin-top: 8px;
+  padding: 0 5px;
+  line-height: 34px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #555;
+  text-decoration: none;
+  text-shadow: 0 1px white;
+}
+.nav-link:hover {
+  color: #333;
+  text-decoration: underline;
+}
+.nav-counter {
+  position: absolute;
+  top: -1px;
+  right: 1px;
+  min-width: 8px;
+  height: 20px;
+  line-height: 20px;
+  margin-top: -11px;
+  padding: 0 6px;
+  font-weight: normal;
+  color: white;
+  text-align: center;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.2);
+  background: #e23442;
+  border: 1px solid #911f28;
+  border-radius: 11px;
+  background-image: -webkit-linear-gradient(top, #e8616c, #dd202f);
+  background-image: -moz-linear-gradient(top, #e8616c, #dd202f);
+  background-image: -o-linear-gradient(top, #e8616c, #dd202f);
+  background-image: linear-gradient(to bottom, #e8616c, #dd202f);
+  -webkit-box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.1), 0 1px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.1), 0 1px rgba(0, 0, 0, 0.12);
+}
+
+.nav-counter-green {
+  background: #75a940;
+  border: 1px solid #42582b;
+  background-image: -webkit-linear-gradient(top, #8ec15b, #689739);
+  background-image: -moz-linear-gradient(top, #8ec15b, #689739);
+  background-image: -o-linear-gradient(top, #8ec15b, #689739);
+  background-image: linear-gradient(to bottom, #8ec15b, #689739);
+}
+
+.nav-counter-blue {
+  background: #3b8de2;
+  border: 1px solid #215a96;
+  background-image: -webkit-linear-gradient(top, #67a7e9, #2580df);
+  background-image: -moz-linear-gradient(top, #67a7e9, #2580df);
+  background-image: -o-linear-gradient(top, #67a7e9, #2580df);
+  background-image: linear-gradient(to bottom, #67a7e9, #2580df);
+}
+
+.theme-boxs {
+	float: left;
+	height: 530px;
+	width: 155px;
+}
+.theme-boxs .theme-itme{
+	float: left;
+	padding:0px;
+	height: 530px; 
+	width:  155px; 
+	position:relative; 
+	margin-left:3px; 
+	margin-right:3px; 
+	overflow:hidden;
+}
+
+.theme-boxs ul {
+	float: left;
+	position: absolute;
+	height: 530px;
+	left:0px;
+	padding:0px;
+	margin:0px;
+}
+
+.theme-boxs ul li {
+	float: left;
+	width: 68px;
+	height: 72px;
+	cursor: pointer;
+	margin-right: 5px;
+}
+
+.theme-boxs ul li .themeColor {
+	width: 42px;
+	height: 42px;
+	margin: 8px 13px 0px;
+	border: 1px dashed #0972A5;
+}
+
+.theme-boxs ul li .themeName {
+	text-align: center;
+	height: 20px;
+	line-height: 20px;
+	font-size: 12px;
+	color: #EEE;
+}
+
+.theme-boxs .theme_yes{
+	display:block; 
+	width: 16px; 
+	height: 16px;
+	margin: auto; 
+	margin-top:13px;
+}
+#timerSpan {
+	width:280px;
+	display: block;
+	color: #EEE;
+	font-size:12px;
+	font-weight:bold;
+	background-position:10,5;
+	padding: 8px 30px;
+}
+
+#userInfo {
+	width:140px;
+	display: block;
+	color: #EEE;
+	font-size:12px;
+	font-weight:bold;
+	background-position:10,5;
+	padding: 8px 30px;
+}

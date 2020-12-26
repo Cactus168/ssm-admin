@@ -1,0 +1,51 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	font-family: "Î¢ÈíÑÅºÚ";
+	min-height: 95%;
+	width: 100%;
+}
+.table-bg { 
+	border-right:1px solid #cccccc;
+	empty-cells: show;
+          border-collapse: collapse;
+          border-spacing: 0;
+}
+
+.table-bg .header{
+	background: url(images/table-tr-bg.png) repeat-x left bottom #fafafa;
+	height:23px; 
+	line-height: 23px;
+}
+.table-bg thead tr td{
+	border-left:1px solid #cccccc;  
+	border-bottom:1px solid #cccccc;
+	font-size: 12px; 
+	font-weight: bold;
+	line-height: 23px;
+	text-align: center;
+	height:23px;
+}
+
+.table-bg tbody tr{
+	line-height: 23px;
+	height:23px;
+}
+.table-bg tbody tr td{
+	border-left:1px solid #cccccc; 
+	border-bottom:1px solid #cccccc;
+	font-size: 12px;
+	padding-left:3px;
+	padding-right:3px;
+	line-height: 23px;
+	height:23px;
+	text-align: center;
+}

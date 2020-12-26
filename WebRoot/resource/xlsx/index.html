@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>导入demo</title>
+	<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="./css/default/easyui.css" />
+	<link rel="stylesheet" href="./css/icon.css" />
+	<script src="./js/jquery.min.js"></script>
+	<script src="http://cdn.bootcss.com/vue/2.2.4/vue.min.js"></script>
+	<script src="./js/xlsx.full.min.js"></script>
+	<script src="./js/jquery.easyui.min.js"></script>
+	<script src="./js/jquery-migrate-1.2.1.js"></script>
+	<script src="./js/jquery.TableFreeze.js"></script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		
+		html {
+			height: 100%;
+			width: 100%;
+		}
+		
+		body {
+			font-family: "微软雅黑";
+			min-height: 95%;
+			width: 100%;
+		}
+		
+		.nav-bar {
+			padding-top: 20px;
+			padding-left: 20px;
+			padding-right: 20px;
+		}
+		
+		button i.glyphicon {
+			margin-right: 4px;
+		}
+
+		
+		.table-bg { 
+			border-right:1px solid #cccccc;
+			empty-cells: show;
+            border-collapse: collapse;
+            border-spacing: 0;
+		}
+
+		.table-bg .header{
+			background: url(images/table-tr-bg.png) repeat-x left bottom #fafafa;
+			height:23px; 
+			line-height: 23px;
+		}
+		.table-bg thead tr td{
+			border-left:1px solid #cccccc;  
+			border-bottom:1px solid #cccccc;
+			font-size: 12px; 
+			font-weight: bold;
+			line-height: 23px;
+			text-align: center;
+			height:23px;
+		}
+
+		.table-bg tbody tr{
+			line-height: 23px;
+			height:23px;
+		}
+		.table-bg tbody tr td{
+			border-left:1px solid #cccccc; 
+			border-bottom:1px solid #cccccc;
+			font-size: 12px;
+			padding-left:3px;
+			padding-right:3px;
+			line-height: 23px;
+			height:23px;
+			text-align: center;
+		}
+
+	</style>
+</head>
+
+<body>
+	<input type="file" id="FileInput" hidden="hidden" style="display: none;" onchange="readfls(this.files)" />
+	<div id="app">
+		<div class="nav-bar">
+			<div class="btn-toolbar" role="toolbar">
+				<div class="input-group" style="width: 451px;" onclick="$('#FileInput')[0].click()">
+					<span class="input-group-btn">
+				        <button class="btn btn-info" type="button" ><i class="glyphicon glyphicon-folder-open"></i>选择文件</button>
+				      </span>
+					<input type="text" class="form-control" placeholder="请选择文件" readonly="readonly" v-model="fileInfo.name">
+				</div>
+				<div class="input-group" style="width: 151px;">
+					<span class="input-group-btn"  style="font-size: 10px;line-height: 30px;">
+				{{'文件大小:'+fileInfo.size+'b'}}
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="tt" style="width:1000px;height:800px;"></div>
+	<div id="tab-tools" style="display:none;">
+		<a id="opts" href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-tip'"></a>
+	</div>
+	<script>
+		var ImportFile = null;
+		$('#opts').tooltip({
+    		showEvent: 'click',
+			content: function(){
+				var dc = [];
+				dc.push('<table cellpadding="0" cellspacing="5" border="0">');
+				dc.push('<tr><td>固定首行：</td>');
+				dc.push('<td><input class="easyui-validatebox textbox" id="fixedFirstRow" type="text" style="width:100%;height:35px;" value="1"/></td></tr>')
+				dc.push('<tr><td>固定列：</td>');
+				dc.push('<td><input class="easyui-validatebox textbox" id="fixedCol" type="text" style="width:100%;height:35px;" value="1"/></td></tr>');
+				dc.push('<tr><td>固定尾行：</td>');
+				dc.push('<td><input class="easyui-validatebox textbox" id="fixedLastRow" type="text" style="width:100%;height:35px;" value="0"/></td></tr>');
+				dc.push('<tr align="center"><td colspan="2">');
+				dc.push('<a href="javascript:void(0)" onclick="setA()">设置</a>');
+				dc.push('</td></tr></table>');
+				return dc.join("");
+			},
+			onShow: function(){
+				var t = $(this);
+				t.tooltip('tip').unbind().bind('mouseenter', function(){
+					t.tooltip('show');
+				}).bind('mouseleave', function(){
+					t.tooltip('hide');
+				});
+			}
+		});
+		function readfls(fls) {
+			if (fls && fls.length > 0) {
+				ImportFile = fls[0];
+				var fileX = ImportFile.name.split(".").reverse()[0];
+				var fileXyes = false;
+				["xlsx", "xlc", "xlm", "xls", "xlt", "xlw", "csv"].forEach(function (value, index, array) {
+					if (fileX === value) {
+						fileXyes = true;
+					}
+				});
+				if (fileXyes) {
+					app.fileInfo.name = ImportFile.name;
+					app.fileInfo.size = ImportFile.size;
+					file2Xce(ImportFile).then(function (wb) {
+						$('#tt').tabs({tools:'#tab-tools',tabPosition:"left"});
+						var tabs = $("#tt").tabs("tabs");
+						for(var i = 0; i < tabs.length; i++){
+							$("#tt").tabs("close", tabs[i].panel("options").title);
+						}
+						for(var i = 0; i < wb.SheetNames.length; i++){
+							$('#tt').tabs('add',{
+								title:wb.SheetNames[i],
+								selected: (i == 0 ? true : false),
+								content:function(){
+									var pmodel = [];
+									var t = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]]);
+									if (t && t.length > 0) {
+										var index = 0;
+										var tables = [];
+										var cols = [];
+										for (var th in t[0]) {
+											cols.push(th);
+										}
+										tables.push('<table id="dataTable_'+i+'" border="1" cellpadding="0" cellspacing="0" class="table-bg">');
+										tables.push('<thead id="t_th">');
+										tables.push('<tr id="t_tr" r="0" class="header">');
+										tables.push('<td c="-1" style="height: auto; width: 50px;">序号</td>');
+										for (var v = 0; v < cols.length; v++) {
+											tables.push('<td c="'+v+'">'+cols[v]+'</td>');
+										}
+										tables.push('</tr></thead><tbody id="t_tb">');
+										for(var m = 0; m < t.length; m++){
+											tables.push('<tr r="'+(m+1)+'" align="center">');
+											tables.push('<td c="-1" style="height: auto; width: 50px;">'+(m+1)+'</td>');
+											for (var v = 0; v < cols.length; v++) {
+												tables.push('<td c="'+v+'">'+(t[m][cols[v]] == undefined ? "" : t[m][cols[v]])+'</td>');
+											}
+											tables.push('</tr>');
+										}
+										tables.push('</tbody></table>');
+									}
+									return tables.join("");
+								},
+								closable:false
+							});
+						}
+						return new Promise(function (resolve, reject) {
+							resolve(wb);
+						});
+					}).then(function(wb){
+						for(var i = 0; i < wb.SheetNames.length; i++){
+							var merges = wb.Sheets[wb.SheetNames[i]]["!merges"];
+							if(merges){
+								for(var a = 0; a < merges.length; a++){
+									var merge = merges[a];
+									var s = merge.s;
+									var e = merge.e;
+									if(s.r != e.r){
+										$("tr[r='"+s.r+"']","#dataTable_"+i+"").find("td[c='"+s.c+"']").attr("rowspan",(e.r-s.r)+1);
+										for(var n = s.r+1; n <= e.r; n++){
+											$("tr[r='"+n+"']","#dataTable_"+i+"").find("td[c='"+s.c+"']").remove()
+										}
+									}
+									if(s.c != e.c){
+										$("tr[r='"+s.r+"']","#dataTable_"+i+"").find("td[c='"+s.c+"']").attr("colspan",(e.c-s.c)+1);
+										for(var n = s.c+1; n <= e.c; n++){
+											$("tr[r='"+s.r+"']","#dataTable_"+i+"").find("td[c='"+n+"']").remove()
+											$("tr[r='"+e.r+"']","#dataTable_"+i+"").find("td[c='"+n+"']").remove()
+										}
+									}
+								}
+							}
+							$("#dataTable_"+i+"").FrozenTable(2,2,1);
+						}
+					});
+				} else {
+					alert("格式错误！请重新选择");
+				}
+			}
+		}
+		function file2Xce(f) {
+			return new Promise(function (resolve, reject) {
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					var data = e.target.result;
+					if (app.rABS) {
+						wb = XLSX.read(btoa(fixdata(data)), { //手动转化
+							type: 'base64'
+						});
+					} else {
+						wb = XLSX.read(data, {
+							type: 'binary'
+						});
+					}
+					resolve(wb);
+				};
+				if (app.rABS) {
+					reader.readAsArrayBuffer(f);
+				} else {
+					reader.readAsBinaryString(f);
+				}
+			});
+		};
+
+		function fixdata(data) { //文件流转BinaryString
+			var o = "",
+				l = 0,
+				w = 10240;
+			for (; l < data.byteLength / w; ++l) o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w, l * w + w)));
+			o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)));
+			return o;
+		}
+
+
+		var app = new Vue({
+			el: "#app",
+			data: {
+				rABS: false, //是否将文件读取为二进制字符串
+				fileInfo: {
+					name: "",
+					size: 0
+				},
+				tableDemo: {
+					thead: [],
+					tbody: []
+				}
+			}
+		});
+		function setA(){
+			var fixedFirstRow = $.trim($("#fixedFirstRow").val()) == "" ? 0 : $.trim($("#fixedFirstRow").val());
+			var fixedCol = $.trim($("#fixedCol").val()) == "" ? 0 : $.trim($("#fixedCol").val());
+			var fixedLastRow = $.trim($("#fixedLastRow").val()) == "" ? 0 : $.trim($("#fixedLastRow").val());
+			var table = $("#tt").tabs('getSelected').find('table').attr("id");
+			$("#oDivH_"+table+"").remove();
+			$("#oDivL_"+table+"").remove();
+			$("#oTableLH_"+table+"").remove();
+			$("#"+table+"").FrozenTable(fixedFirstRow,fixedLastRow,fixedCol);
+			alert("设置成功！");
+		};
+	</script>
+	<div id="aa"></div>
+</body>
+</html>

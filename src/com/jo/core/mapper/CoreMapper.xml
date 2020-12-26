@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.core.dao.CoreDao" >
+
+  <select id="loginCheck" resultType="com.jo.sys.user.bean.User" parameterType="com.jo.core.bean.CoreBean" >
+    SELECT * FROM t_sys_user WHERE userName = #{userName} AND passWord = #{passWord}
+  </select>
+  
+  <select id="getMenusByUserId" resultType="com.jo.sys.menu.bean.Menu" parameterType="java.util.Map" >
+  	SELECT A.* FROM t_sys_menu A LEFT JOIN t_sys_role_menu B ON A.menuId = B.menuId LEFT JOIN t_sys_user_role C ON B.roleId = C.roleId WHERE A.buttonId = 0 AND A.menuStatus = 1 AND C.userId = #{userId} ORDER BY A.menuOrder
+  </select>
+  
+  <select id="getButtonsByMenuId" resultType="com.jo.sys.button.bean.Button" parameterType="java.util.Map" >
+  	SELECT A.* FROM t_sys_button A LEFT JOIN t_sys_menu B ON A.buttonId = B.buttonId LEFT JOIN t_sys_role_menu C ON B.menuId = C.menuId LEFT JOIN t_sys_user_role D ON C.roleId = D.roleId WHERE B.parentId = #{menuId} AND D.userId = #{currUserId} ORDER BY A.buttonSort
+  </select>
+  
+  <select id="getDictsByMenuId" resultType="com.jo.sys.dict.bean.Dict" parameterType="java.util.Map" >
+    SELECT A.* FROM t_sys_dict A LEFT JOIN t_sys_menu_dict B ON A.dictId = B.dictId WHERE B.menuId = #{menuId} ORDER BY A.dictId
+  </select>
+  
+  <select id="getCollectMenus" resultType="java.util.Map" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_collect_menu A LEFT JOIN t_sys_menu B ON A.menuId = B.menuId WHERE A.userId = #{userId}
+  </select>
+  
+  <insert id="addCollectMenu" parameterType="java.util.Map" >
+     INSERT INTO t_sys_collect_menu
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+         <if test="userId != null" >userId,</if>
+      	 <if test="menuId != null" >menuId,</if>
+      	 <if test="collectName != null" >collectName,</if>
+      	 <if test="collectUrl != null" >collectUrl,</if>
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="userId != null" >#{userId,jdbcType=INTEGER},</if>
+	   	 <if test="menuId != null">#{menuId,jdbcType=INTEGER},</if>
+	   	 <if test="collectName != null">#{collectName,jdbcType=VARCHAR},</if>
+	   	 <if test="collectUrl != null">#{collectUrl,jdbcType=VARCHAR},</if>
+	  </trim>
+  </insert>
+	
+  <delete id="removeCollectMenu" parameterType="java.util.Map">
+	 DELETE FROM t_sys_collect_menu
+	 <where>
+	   <if test="userId != null and userId != ''">
+	    	AND userId = #{userId} 
+	   </if>
+	   <if test="menuId != null and menuId != ''">
+	    	AND menuId = #{menuId} 
+	   </if>
+	   <if test="collectUrl != null and collectUrl != ''">
+	    	AND collectUrl = #{collectUrl} 
+	   </if>
+   </where>
+  </delete>
+</mapper>

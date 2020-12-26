@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.role.dao.RoleDao" >
+ <insert id="add" parameterType="com.jo.sys.role.bean.Role" >
+     INSERT INTO t_sys_role
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	<if test="roleName != null" >roleName,</if>
+	     <if test="roleContent != null" >roleContent,</if>
+	     <if test="creator != null" >creator,</if>
+	     createDate,
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="roleName != null" >#{roleName,jdbcType=VARCHAR},</if>
+	     <if test="roleContent != null" >#{roleContent,jdbcType=VARCHAR},</if>
+	     <if test="creator != null" >#{creator,jdbcType=INTEGER},</if>
+	     now(),
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_role WHERE roleId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.role.bean.Role" >
+    UPDATE t_sys_role
+       <set>
+	       <if test="roleName != null" >
+	         roleName = #{roleName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="roleContent != null" >
+	         roleContent = #{roleContent,jdbcType=VARCHAR},
+	       </if>
+	       <if test="modify != null" >
+	         modify = #{modify,jdbcType=INTEGER},
+	       </if>
+	        modifyDate = now(),
+      </set>
+   WHERE roleId = #{roleId,jdbcType=INTEGER}
+  </update>
+  <select id="queryById" resultType="com.jo.sys.role.bean.Role" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_role WHERE roleId = #{roleId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.role.bean.Role" parameterType="com.jo.sys.role.bean.Role" >
+    SELECT A.*, COUNT(B.userId) AS roleUse FROM t_sys_role A LEFT JOIN t_sys_user_role B ON A.roleId = B.roleId 
+    <where>
+       <if test="roleName != null and roleName != '' ">   
+	       AND A.roleName like CONCAT('%',#{roleName},'%') 
+	   </if>
+	   <if test="creator != null and creator != '' ">   
+	       AND A.creator = #{creator} 
+	   </if>
+   </where>
+   GROUP BY A.roleId
+   ORDER BY ${sort} ${order}
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="com.jo.sys.role.bean.Role" >
+    SELECT COUNT(roleId) FROM t_sys_role 
+    <where>
+       <if test="roleName != null and roleName != '' ">   
+	       AND roleName like CONCAT('%',#{roleName},'%') 
+	   </if>
+	   <if test="creator != null and creator != '' ">   
+	       AND creator = #{creator} 
+	   </if>
+   </where>
+  </select>
+  <delete id="removeMenusByRoleId" parameterType="java.util.Map">
+     DELETE FROM t_sys_role_menu WHERE roleId = #{roleId};
+  </delete>
+  <insert id="changeRoleMenuRights" parameterType="java.util.Map">
+     INSERT INTO t_sys_role_menu (roleId,menuId) SELECT #{roleId} AS roleId, menuId FROM t_sys_menu WHERE menuId IN (${menuIds});
+  </insert>
+  <select id="getMenusByRoleId" resultType="com.jo.sys.role.bean.RoleMenu" parameterType="java.util.Map" >
+	  SELECT * FROM (
+		 SELECT 
+			A.menuId, 
+			CASE WHEN A.buttonId != 0 THEN (SELECT E.menuType FROM t_sys_menu E WHERE E.menuId = A.parentId) ELSE A.menuType END AS menuType,
+			CASE WHEN A.buttonId != 0 AND B.parentId != 0 THEN (SELECT D.menuId FROM t_sys_menu D WHERE D.buttonId = B.parentId) ELSE A.parentId END AS _parentId, 
+			CASE WHEN A.buttonId != 0 THEN B.buttonName ELSE A.menuName END AS menuName, 
+			C.roleId, IFNULL(C.roleId,0) AS checked 
+		 FROM t_sys_menu A LEFT JOIN t_sys_button B ON A.buttonId = B.buttonId
+		 LEFT JOIN t_sys_role_menu C ON A.menuId = C.menuId AND C.roleId = #{roleId}
+	 ) T WHERE T.menuType = #{menuType}
+  </select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.code.dao.CodeAttrDao" >
+ <insert id="add" parameterType="com.jo.sys.code.bean.CodeAttr" >
+     INSERT INTO t_sys_code_attr
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	 <if test="codeId != null" >codeId,</if>
+	     <if test="attrName != null" >attrName,</if>
+	     <if test="attrType != null" >attrType,</if>
+	     <if test="attrTitle != null" >attrTitle,</if>
+	     <if test="attrEdit != null" >attrEdit,</if>
+	     <if test="attrRequired != null" >attrRequired,</if>
+	     <if test="dataValidType != null" >dataValidType,</if>
+	     <if test="attrSearch != null" >attrSearch,</if>
+	     <if test="attrSor != null" >attrSor,</if>
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="codeId != null" >#{codeId,jdbcType=INTEGER},</if>
+	     <if test="attrName != null" >#{attrName,jdbcType=VARCHAR},</if>
+	     <if test="attrType != null" >#{attrType,jdbcType=VARCHAR},</if>
+	     <if test="attrTitle != null" >#{attrTitle,jdbcType=VARCHAR},</if>
+	     <if test="attrEdit != null" >#{attrEdit,jdbcType=INTEGER},</if>
+	     <if test="attrRequired != null" >#{attrRequired,jdbcType=INTEGER},</if>
+	     <if test="dataValidType != null" >#{dataValidType,jdbcType=VARCHAR},</if>
+	     <if test="attrSearch != null" >#{attrSearch,jdbcType=INTEGER},</if>
+	     <if test="attrSor != null" >#{attrSor,jdbcType=INTEGER},</if>
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_code_attr WHERE attrId IN (${ids}) OR codeId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.code.bean.CodeAttr" >
+    UPDATE t_sys_code_attr
+       <set>
+	       <if test="attrName != null" >
+	         attrName = #{attrName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="attrType != null" >
+	         attrType = #{attrType,jdbcType=VARCHAR},
+	       </if>
+	       <if test="attrTitle != null" >
+	         attrTitle = #{attrTitle,jdbcType=VARCHAR},
+	       </if>
+	       <if test="attrEdit != null" >
+	         attrEdit = #{attrEdit,jdbcType=INTEGER},
+	       </if>
+	       <if test="attrRequired != null" >
+	         attrRequired = #{attrRequired,jdbcType=INTEGER},
+	       </if>
+	       <if test="dataValidType != null" >
+	         dataValidType = #{dataValidType,jdbcType=VARCHAR},
+	       </if>
+	       <if test="attrSearch != null" >
+	         attrSearch = #{attrSearch,jdbcType=INTEGER},
+	       </if>
+	       <if test="attrSor != null" >
+	         attrSor = #{attrSor,jdbcType=INTEGER},
+	       </if>
+      </set>
+   WHERE attrId = #{attrId,jdbcType=INTEGER}
+  </update>
+  <select id="queryById" resultType="com.jo.sys.code.bean.CodeAttr" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_code_attr WHERE attrId = #{attrId,jdbcType=INTEGER}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.code.bean.CodeAttr" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_code_attr WHERE codeId = #{codeId,jdbcType=INTEGER} ORDER BY ${sort} ${order} LIMIT ${beginRow},${pageSize}
+  </select>
+  
+  <select id="count" resultType="java.lang.Integer" parameterType="java.util.Map" >
+    SELECT COUNT(attrId) FROM t_sys_code_attr WHERE codeId = #{codeId,jdbcType=INTEGER}
+  </select>
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.message.dao.MessageDao" >
+ <insert id="add" parameterType="com.jo.sys.message.bean.Message" >
+     INSERT INTO t_sys_message
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	<if test="sendUser != null" >sendUser,</if>
+	     <if test="sendContent != null" >sendContent,</if>
+	     <if test="receiveUser != null" >receiveUser,</if>
+	     sendDate,
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="sendUser != null" >#{sendUser,jdbcType=INTEGER},</if>
+	     <if test="sendContent != null" >#{sendContent,jdbcType=VARCHAR},</if>
+	     <if test="receiveUser != null" >#{receiveUser,jdbcType=INTEGER},</if>
+	     now(),
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_message WHERE messageId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.menu.bean.Menu" >
+    UPDATE t_sys_message
+       <set>
+	       <if test="sendUser != null" >
+	         sendUser = #{sendUser,jdbcType=INTEGER},
+	       </if>
+	       <if test="sendDate != null" >
+	         sendContent = #{sendContent,jdbcType=VARCHAR},
+	       </if>
+	       <if test="receiveUser != null" >
+	         receiveUser = #{receiveUser,jdbcType=INTEGER},
+	       </if>
+	       <if test="sendContent != null" >
+	         receiveDate = #{receiveDate,jdbcType=VARCHAR},
+	       </if>
+      </set>
+   WHERE messageId = #{messageId,jdbcType=INTEGER}
+  </update>
+  <select id="queryById" resultType="com.jo.sys.message.bean.Message" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_message WHERE messageId = #{messageId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.message.bean.Message" parameterType="com.jo.sys.message.bean.Message" >
+    SELECT A.messageId,A.sendUser,B.userName,B.realName, A.sendDate, A.receiveUser, C.menuName, A.sendContent, A.logDate 
+    FROM t_sys_message A LEFT JOIN t_sys_user B ON A.sendUser = B.userId LEFT JOIN t_sys_menu C ON A.receiveUser = C.receiveUser
+    <where>
+       <if test="userName != null and userName != '' ">   
+	       AND B.userName like CONCAT('%',#{userName},'%') 
+	   </if>
+	   <if test="realName != null and realName != ''">
+	    	AND B.realName like CONCAT('%',#{realName},'%') 
+	   </if>
+ 	   <if test="menuName != null and menuName != ''">    
+ 	       AND C.menuName like CONCAT('%',#{menuName},'%')
+ 	   </if>
+ 	   <if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">    
+ 	       AND A.logDate BETWEEN CONCAT(#{beginDate},' 00:00:00') AND CONCAT(#{endDate},' 23:59:59') 
+ 	   </if>
+   </where>
+   ORDER BY A.messageId 
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="com.jo.sys.message.bean.Message" >
+    SELECT 
+    	COUNT(A.messageId)
+    FROM t_sys_message A LEFT JOIN t_sys_user B ON A.sendUser = B.sendUser LEFT JOIN t_sys_menu C ON A.receiveUser = C.receiveUser
+    <where>
+       <if test="userName != null and userName != '' ">   
+	       AND B.userName like CONCAT('%',#{userName},'%') 
+	   </if>
+	   <if test="realName != null and realName != ''">
+	    	AND B.realName like CONCAT('%',#{realName},'%') 
+	   </if>
+ 	   <if test="menuName != null and menuName != ''">    
+ 	       AND C.menuName like CONCAT('%',#{menuName},'%')
+ 	   </if>
+ 	   <if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">    
+ 	       AND A.logDate BETWEEN CONCAT(#{beginDate},' 00:00:00') AND CONCAT(#{endDate},' 23:59:59') 
+ 	   </if>
+   </where>
+  </select>
+</mapper>

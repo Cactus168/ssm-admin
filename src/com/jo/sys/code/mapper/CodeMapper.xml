@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jo.sys.code.dao.CodeDao" >
+ <insert id="add" parameterType="com.jo.sys.code.bean.Code" >
+     INSERT INTO t_sys_code
+      <trim prefix="(" suffix=")" suffixOverrides="," >
+      	<if test="packageName != null" >packageName,</if>
+	     <if test="objectName != null" >objectName,</if>
+	     <if test="tableTop != null" >tableTop,</if>
+	     <if test="dataView != null" >dataView,</if>
+	     <if test="dataSelect != null" >dataSelect,</if>
+	   </trim>
+	   <trim prefix="values (" suffix=")" suffixOverrides="," >
+	   	 <if test="packageName != null" >#{packageName,jdbcType=VARCHAR},</if>
+	     <if test="objectName != null" >#{objectName,jdbcType=VARCHAR},</if>
+	     <if test="tableTop != null" >#{tableTop,jdbcType=VARCHAR},</if>
+	     <if test="dataView != null" >#{dataView,jdbcType=VARCHAR},</if>
+	     <if test="dataSelect != null" >#{dataSelect,jdbcType=INTEGER},</if>
+	  </trim>
+ </insert>
+ <delete id="remove" parameterType="java.util.Map">
+     DELETE FROM t_sys_code WHERE codeId IN (${ids});
+ </delete>
+ <update id="modify" parameterType="com.jo.sys.code.bean.Code" >
+    UPDATE t_sys_code
+       <set>
+	       <if test="packageName != null" >
+	         packageName = #{packageName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="objectName != null" >
+	         objectName = #{objectName,jdbcType=VARCHAR},
+	       </if>
+	       <if test="tableTop != null" >
+	         tableTop = #{tableTop,jdbcType=VARCHAR},
+	       </if>
+	       <if test="dataView != null" >
+	         dataView = #{dataView,jdbcType=VARCHAR},
+	       </if>
+	       <if test="dataSelect != null" >
+	         dataSelect = #{dataSelect,jdbcType=INTEGER},
+	       </if>
+      </set>
+   WHERE codeId = #{codeId,jdbcType=INTEGER}
+  </update>
+  <select id="queryById" resultType="com.jo.sys.code.bean.Code" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_code WHERE codeId = #{codeId}
+  </select>
+  <select id="queryByList" resultType="com.jo.sys.code.bean.Code" parameterType="java.util.Map" >
+    SELECT * FROM t_sys_code A
+    <where>
+       <if test="packageName != null and packageName != '' ">   
+	       AND A.packageName like CONCAT('%',#{packageName},'%') 
+	   </if>
+	   <if test="objectName != null and objectName != '' ">   
+	       AND A.objectName like CONCAT('%',#{objectName},'%') 
+	   </if>
+   </where>
+   ORDER BY ${sort} ${order}
+   LIMIT ${beginRow},${pageSize}
+  </select>
+  <select id="count" resultType="java.lang.Integer" parameterType="java.util.Map" >
+    SELECT COUNT(codeId) FROM t_sys_code 
+    <where>
+       <if test="packageName != null and packageName != '' ">   
+	       AND packageName like CONCAT('%',#{packageName},'%') 
+	   </if>
+	   <if test="objectName != null and objectName != '' ">   
+	       AND objectName like CONCAT('%',#{objectName},'%') 
+	   </if>
+   </where>
+  </select>
+</mapper>
